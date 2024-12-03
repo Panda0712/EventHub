@@ -1,17 +1,14 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import {useAsyncStorage} from '@react-native-async-storage/async-storage';
 import {NavigationContainer} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import {StatusBar} from 'react-native';
-import AuthNavigator from './src/navigators/AuthNavigator';
-import MainNavigator from './src/navigators/MainNavigator';
+import Toast from 'react-native-toast-message';
+import {Provider} from 'react-redux';
+import AppRouters from './src/navigators/AppRouters';
+import store from './src/redux/store';
 import {SplashScreen} from './src/screens';
 
 const App = () => {
   const [isShowSplash, setIsShowSplash] = useState(true);
-  const [accessToken, setAccessToken] = useState('');
-
-  const {getItem, setItem} = useAsyncStorage('accessToken');
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -21,16 +18,6 @@ const App = () => {
     return () => clearTimeout(timeout);
   }, []);
 
-  useEffect(() => {
-    checkLogin();
-  }, []);
-
-  const checkLogin = async () => {
-    const token = await getItem();
-
-    token && setAccessToken(token);
-  };
-
   return (
     <>
       <StatusBar
@@ -38,13 +25,17 @@ const App = () => {
         backgroundColor="transparent"
         translucent
       />
-      {isShowSplash ? (
-        <SplashScreen />
-      ) : (
-        <NavigationContainer>
-          {accessToken ? <MainNavigator /> : <AuthNavigator />}
-        </NavigationContainer>
-      )}
+      <Provider store={store}>
+        {isShowSplash ? (
+          <SplashScreen />
+        ) : (
+          <NavigationContainer>
+            <AppRouters />
+          </NavigationContainer>
+        )}
+      </Provider>
+
+      <Toast />
     </>
   );
 };
