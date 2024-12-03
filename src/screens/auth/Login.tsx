@@ -17,11 +17,18 @@ import {appInfos} from '../../constants/appInfos';
 import {globalStyles} from '../../styles/globalStyles';
 import SocialComponent from './components/SocialComponent';
 import authenticationAPI from '../../api/authApi';
+import Toast from 'react-native-toast-message';
+import {validateEmail} from '../../utils/helpers';
+import {useDispatch} from 'react-redux';
+import {addAuth} from '../../redux/reducers/authReducer';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LoginScreen = ({navigation}: any) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isRemember, setIsRemember] = useState(true);
+
+  const dispatch = useDispatch();
 
   const passwordShowHideButton = {
     show: <FontAwesome name="eye" size={22} color={appColors.grey} />,
@@ -29,10 +36,45 @@ const LoginScreen = ({navigation}: any) => {
   };
 
   const handleLogin = async () => {
-    try {
-      const res = await authenticationAPI.HandleAuthentication('/hello');
+    if (!email || !password) {
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Please enter your email and password.',
+      });
+      return;
+    }
 
-      console.log(res);
+    if (!validateEmail(email)) {
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Please enter a valid email address.',
+      });
+      return;
+    }
+
+    if (password.length < 6) {
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Password should be at least 6 characters long.',
+      });
+      return;
+    }
+
+    try {
+      const res = await authenticationAPI.HandleAuthentication(
+        '/login',
+        {email, password},
+        'post',
+      );
+
+      dispatch(addAuth(res.data));
+      await AsyncStorage.setItem(
+        'auth',
+        isRemember ? JSON.stringify(res.data) : email,
+      );
     } catch (error) {
       console.log(error);
     }

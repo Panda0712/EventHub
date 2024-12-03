@@ -1,12 +1,15 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import {useAsyncStorage} from '@react-native-async-storage/async-storage';
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {addAuth, authSelector} from '../redux/reducers/authReducer';
 import AuthNavigator from './AuthNavigator';
 import MainNavigator from './MainNavigator';
+import {SplashScreen} from '../screens';
 
 const AppRouters = () => {
+  const [isShowSplash, setIsShowSplash] = useState(true);
+
   const {getItem} = useAsyncStorage('auth');
 
   const auth = useSelector(authSelector);
@@ -14,6 +17,12 @@ const AppRouters = () => {
 
   useEffect(() => {
     checkLogin();
+
+    const timeout = setTimeout(() => {
+      setIsShowSplash(false);
+    }, 1500);
+
+    return () => clearTimeout(timeout);
   }, []);
 
   const checkLogin = async () => {
@@ -22,7 +31,17 @@ const AppRouters = () => {
     res && dispatch(addAuth(JSON.parse(res)));
   };
 
-  return <>{auth.accessToken ? <MainNavigator /> : <AuthNavigator />}</>;
+  return (
+    <>
+      {isShowSplash ? (
+        <SplashScreen />
+      ) : auth.accessToken ? (
+        <MainNavigator />
+      ) : (
+        <AuthNavigator />
+      )}
+    </>
+  );
 };
 
 export default AppRouters;
