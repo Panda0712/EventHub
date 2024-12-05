@@ -6,9 +6,53 @@ import {appInfos} from '../../constants/appInfos';
 import {globalStyles} from '../../styles/globalStyles';
 import {ArrowRight, Sms} from 'iconsax-react-native';
 import {appColors} from '../../constants/appColors';
+import Toast from 'react-native-toast-message';
+import authenticationAPI from '../../api/authApi';
+import {validateEmail} from '../../utils/helpers';
+import {LoadingModal} from '../../modals';
+import {Alert} from 'react-native';
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleForgotPassword = async () => {
+    if (!email) {
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Email is required',
+      });
+      return;
+    }
+
+    if (!validateEmail(email)) {
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Invalid email address',
+      });
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      const api = '/forgot';
+      const res = await authenticationAPI.HandleAuthentication(
+        api,
+        {email},
+        'post',
+      );
+
+      console.log(res);
+      setIsLoading(false);
+      Alert.alert('We have sent new password to your email!');
+    } catch (error) {
+      setIsLoading(false);
+      console.log(error);
+      throw new Error('Reset password failed! Please try again!');
+    }
+  };
 
   return (
     <Container back isImageBackground>
@@ -18,7 +62,7 @@ const ForgotPassword = () => {
           font={appInfos.fontFamilies.fontBd}
           text="Reset Password"
         />
-        <Space height={6} />
+        <Space height={12} />
         <Text
           size={16}
           font={appInfos.fontFamilies.fontBk}
@@ -43,6 +87,12 @@ const ForgotPassword = () => {
           placeholder="abc@gmail.com"
           placeholderColor="#747688"
           onChange={setEmail}
+          required
+          helpText={
+            email.length > 0 && !validateEmail(email)
+              ? 'Invalid email'
+              : 'Please fill the email'
+          }
           prefix={<Sms size={20} color={appColors.grey} />}
           clear
         />
@@ -51,6 +101,7 @@ const ForgotPassword = () => {
 
         <Section styles={{alignItems: 'center'}}>
           <Button
+            disable={email.length === 0 && !validateEmail(email)}
             title="Send"
             textStyleProps={{
               color: appColors.white,
@@ -62,7 +113,10 @@ const ForgotPassword = () => {
               globalStyles.button,
               {
                 width: appInfos.sizes.width * 0.8,
-                backgroundColor: appColors.primary,
+                backgroundColor:
+                  email.length > 0 && validateEmail(email)
+                    ? appColors.primary
+                    : appColors.grey,
                 minHeight: 64,
                 borderRadius: 16,
               },
@@ -75,10 +129,12 @@ const ForgotPassword = () => {
                 color={appColors.white}
               />
             }
-            onPress={() => {}}
+            onPress={handleForgotPassword}
           />
         </Section>
       </Section>
+
+      <LoadingModal visible={isLoading} />
     </Container>
   );
 };
