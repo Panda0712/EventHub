@@ -7,21 +7,21 @@ import {
   Space,
   Text,
 } from '@bsdaoquang/rncomponent';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Lock, Sms} from 'iconsax-react-native';
 import React, {useState} from 'react';
 import {Image, Switch} from 'react-native';
+import Toast from 'react-native-toast-message';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import {useDispatch} from 'react-redux';
+import authenticationAPI from '../../api/authApi';
 import {Container} from '../../components';
 import {appColors} from '../../constants/appColors';
 import {appInfos} from '../../constants/appInfos';
-import {globalStyles} from '../../styles/globalStyles';
-import SocialComponent from './components/SocialComponent';
-import authenticationAPI from '../../api/authApi';
-import Toast from 'react-native-toast-message';
-import {validateEmail} from '../../utils/helpers';
-import {useDispatch} from 'react-redux';
 import {addAuth} from '../../redux/reducers/authReducer';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import {globalStyles} from '../../styles/globalStyles';
+import {validateEmail} from '../../utils/helpers';
+import SocialComponent from './components/SocialComponent';
 
 const LoginScreen = ({navigation}: any) => {
   const [email, setEmail] = useState('');

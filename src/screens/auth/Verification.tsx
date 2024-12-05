@@ -1,19 +1,19 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useEffect, useRef, useState} from 'react';
-import {Container} from '../../components';
 import {Button, Row, Section, Space, Text} from '@bsdaoquang/rncomponent';
-import {appInfos} from '../../constants/appInfos';
-import {StyleSheet, TextInput, View} from 'react-native';
-import {appColors} from '../../constants/appColors';
-import {globalStyles} from '../../styles/globalStyles';
-import {ArrowRight} from 'iconsax-react-native';
-import authenticationAPI from '../../api/authApi';
-import {LoadingModal} from '../../modals';
-import {useDispatch} from 'react-redux';
-import {addAuth} from '../../redux/reducers/authReducer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {ArrowRight} from 'iconsax-react-native';
+import React, {useEffect, useRef, useState} from 'react';
+import {StyleSheet, TextInput, View} from 'react-native';
+import {useDispatch} from 'react-redux';
+import authenticationAPI from '../../api/authApi';
+import {Container} from '../../components';
+import {appColors} from '../../constants/appColors';
+import {appInfos} from '../../constants/appInfos';
+import {LoadingModal} from '../../modals';
+import {addAuth} from '../../redux/reducers/authReducer';
+import {globalStyles} from '../../styles/globalStyles';
 
-const Verification = ({navigation, route}: any) => {
+const Verification = ({route}: any) => {
   const {code, email, password, username} = route.params;
 
   const [codeValues, setCodeValues] = useState<string[]>([]);

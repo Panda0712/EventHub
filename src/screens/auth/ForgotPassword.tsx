@@ -1,16 +1,16 @@
 /* eslint-disable react-native/no-inline-styles */
 import {Button, Input, Section, Space, Text} from '@bsdaoquang/rncomponent';
-import React, {useState} from 'react';
-import {Container} from '../../components';
-import {appInfos} from '../../constants/appInfos';
-import {globalStyles} from '../../styles/globalStyles';
 import {ArrowRight, Sms} from 'iconsax-react-native';
-import {appColors} from '../../constants/appColors';
+import React, {useState} from 'react';
+import {Alert} from 'react-native';
 import Toast from 'react-native-toast-message';
 import authenticationAPI from '../../api/authApi';
-import {validateEmail} from '../../utils/helpers';
+import {Container} from '../../components';
+import {appColors} from '../../constants/appColors';
+import {appInfos} from '../../constants/appInfos';
 import {LoadingModal} from '../../modals';
-import {Alert} from 'react-native';
+import {globalStyles} from '../../styles/globalStyles';
+import {validateEmail} from '../../utils/helpers';
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');

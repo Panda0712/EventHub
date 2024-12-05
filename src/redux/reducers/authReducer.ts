@@ -22,7 +22,7 @@ const authSlice = createSlice({
       state.authData = action.payload;
     },
 
-    removeAuth: (state, action) => {
+    removeAuth: state => {
       state.authData = initialState;
     },
   },

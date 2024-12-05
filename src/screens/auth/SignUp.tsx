@@ -7,18 +7,14 @@ import {
   Space,
   Text,
 } from '@bsdaoquang/rncomponent';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Lock, PasswordCheck, Sms, User} from 'iconsax-react-native';
 import React, {useEffect, useState} from 'react';
-import Toast from 'react-native-toast-message';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import {useDispatch} from 'react-redux';
 import authenticationAPI from '../../api/authApi';
 import {Container} from '../../components';
 import {appColors} from '../../constants/appColors';
 import {appInfos} from '../../constants/appInfos';
 import {LoadingModal} from '../../modals';
-import {addAuth} from '../../redux/reducers/authReducer';
 import {globalStyles} from '../../styles/globalStyles';
 import {validateEmail} from '../../utils/helpers';
 import SocialComponent from './components/SocialComponent';
@@ -30,8 +26,6 @@ const SignUpScreen = ({navigation}: any) => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isDisable, setIsDisable] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
-
-  const dispatch = useDispatch();
 
   const passwordShowHideButton = {
     show: <FontAwesome name="eye" size={22} color={appColors.grey} />,
@@ -78,59 +72,6 @@ const SignUpScreen = ({navigation}: any) => {
       console.log(error);
       setIsLoading(false);
     }
-
-    // const values = {username, email, password};
-
-    // if (
-    //   username &&
-    //   validateEmail(email) &&
-    //   password &&
-    //   confirmPassword &&
-    //   password === confirmPassword
-    // ) {
-    //   try {
-    //     setIsLoading(true);
-
-    //     const res = await authenticationAPI.HandleAuthentication(
-    //       '/register',
-    //       values,
-    //       'post',
-    //     );
-    //     dispatch(addAuth(res.data));
-    //     await AsyncStorage.setItem('auth', JSON.stringify(res.data));
-    //     setIsLoading(false);
-    //   } catch (error) {
-    //     setIsLoading(false);
-    //     console.log(error);
-    //   }
-    // } else {
-    //   if (!validateEmail(email)) {
-    //     Toast.show({
-    //       type: 'error',
-    //       text1: 'Failed to register',
-    //       text2: 'Please fill the valid email address',
-    //     });
-    //   }
-    //   if (password.length < 6) {
-    //     Toast.show({
-    //       type: 'error',
-    //       text1: 'Failed to register',
-    //       text2: 'Password length must be at least 6 characters',
-    //     });
-    //   }
-    //   if (password !== confirmPassword) {
-    //     Toast.show({
-    //       type: 'error',
-    //       text1: 'Failed to register',
-    //       text2: 'Passwords do not match',
-    //     });
-    //   }
-    //   Toast.show({
-    //     type: 'error',
-    //     text1: 'Failed to register',
-    //     text2: 'Please fill all fields',
-    //   });
-    // }
   };
 
   return (
