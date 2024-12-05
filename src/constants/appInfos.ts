@@ -12,5 +12,5 @@ export const appInfos = {
     fontMd: 'AirbnbCereal_W_Md',
     fontXbd: 'AirbnbCereal_W_XBd',
   },
-  BASE_URL: 'http://192.168.1.7:3001',
+  BASE_URL: 'http://192.168.1.20:3001',
 };

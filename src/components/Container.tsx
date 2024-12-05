@@ -39,6 +39,7 @@ const Container = (props: Props) => {
               paddingVertical: 12,
               minHeight: 48,
               minWidth: 48,
+              justifyContent: 'flex-start',
             }}>
             {back && (
               <TouchableOpacity
@@ -62,7 +63,11 @@ const Container = (props: Props) => {
   };
 
   const returnContainer = isScroll ? (
-    <ScrollView style={[globalStyles.container]}>{children}</ScrollView>
+    <ScrollView
+      style={[globalStyles.container]}
+      showsVerticalScrollIndicator={false}>
+      {children}
+    </ScrollView>
   ) : (
     <View style={[globalStyles.container]}>{children}</View>
   );

@@ -7,29 +7,29 @@ import {
   Space,
   Text,
 } from '@bsdaoquang/rncomponent';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Lock, PasswordCheck, Sms, User} from 'iconsax-react-native';
 import React, {useEffect, useState} from 'react';
+import Toast from 'react-native-toast-message';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import {useDispatch} from 'react-redux';
+import authenticationAPI from '../../api/authApi';
 import {Container} from '../../components';
 import {appColors} from '../../constants/appColors';
 import {appInfos} from '../../constants/appInfos';
-import {globalStyles} from '../../styles/globalStyles';
-import SocialComponent from './components/SocialComponent';
 import {LoadingModal} from '../../modals';
-import authenticationAPI from '../../api/authApi';
-import Toast from 'react-native-toast-message';
-import {validateEmail} from '../../utils/helpers';
-import {useDispatch} from 'react-redux';
 import {addAuth} from '../../redux/reducers/authReducer';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import {globalStyles} from '../../styles/globalStyles';
+import {validateEmail} from '../../utils/helpers';
+import SocialComponent from './components/SocialComponent';
 
 const SignUpScreen = ({navigation}: any) => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [isDisable, setIsDisable] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
-  const [errorText, setErrorText] = useState('');
 
   const dispatch = useDispatch();
 
@@ -38,67 +38,100 @@ const SignUpScreen = ({navigation}: any) => {
     hide: <FontAwesome name="eye-slash" size={22} color={appColors.grey} />,
   };
 
-  const handleSignUp = async () => {
-    const values = {username, email, password};
-
-    if (
-      username &&
-      validateEmail(email) &&
-      password &&
-      confirmPassword &&
-      password === confirmPassword
-    ) {
-      try {
-        setIsLoading(true);
-
-        const res = await authenticationAPI.HandleAuthentication(
-          '/register',
-          values,
-          'post',
-        );
-        dispatch(addAuth(res.data));
-        await AsyncStorage.setItem('auth', JSON.stringify(res.data));
-        setIsLoading(false);
-      } catch (error) {
-        setIsLoading(false);
-        console.log(error);
-      }
-    } else {
-      if (!validateEmail(email)) {
-        Toast.show({
-          type: 'error',
-          text1: 'Failed to register',
-          text2: 'Please fill the valid email address',
-        });
-      }
-      if (password.length < 6) {
-        Toast.show({
-          type: 'error',
-          text1: 'Failed to register',
-          text2: 'Password length must be at least 6 characters',
-        });
-      }
-      if (password !== confirmPassword) {
-        Toast.show({
-          type: 'error',
-          text1: 'Failed to register',
-          text2: 'Passwords do not match',
-        });
-      }
-      Toast.show({
-        type: 'error',
-        text1: 'Failed to register',
-        text2: 'Please fill all fields',
-      });
-      setErrorText('Please fill all fields');
-    }
-  };
-
   useEffect(() => {
-    if (email || password) {
-      setErrorText('');
+    if (
+      !email ||
+      !password ||
+      !confirmPassword ||
+      !username ||
+      !validateEmail(email) ||
+      confirmPassword !== password ||
+      password.length < 6
+    ) {
+      setIsDisable(true);
+    } else {
+      setIsDisable(false);
     }
-  }, [email, password]);
+  }, [username, email, password, confirmPassword]);
+
+  const handleSignUp = async () => {
+    const api = '/verification';
+
+    setIsLoading(true);
+    try {
+      const res = await authenticationAPI.HandleAuthentication(
+        api,
+        {email},
+        'post',
+      );
+
+      setIsLoading(false);
+
+      navigation.navigate('Verification', {
+        code: res.data.code,
+        email,
+        password,
+        username,
+      });
+      console.log(res);
+    } catch (error) {
+      console.log(error);
+      setIsLoading(false);
+    }
+
+    // const values = {username, email, password};
+
+    // if (
+    //   username &&
+    //   validateEmail(email) &&
+    //   password &&
+    //   confirmPassword &&
+    //   password === confirmPassword
+    // ) {
+    //   try {
+    //     setIsLoading(true);
+
+    //     const res = await authenticationAPI.HandleAuthentication(
+    //       '/register',
+    //       values,
+    //       'post',
+    //     );
+    //     dispatch(addAuth(res.data));
+    //     await AsyncStorage.setItem('auth', JSON.stringify(res.data));
+    //     setIsLoading(false);
+    //   } catch (error) {
+    //     setIsLoading(false);
+    //     console.log(error);
+    //   }
+    // } else {
+    //   if (!validateEmail(email)) {
+    //     Toast.show({
+    //       type: 'error',
+    //       text1: 'Failed to register',
+    //       text2: 'Please fill the valid email address',
+    //     });
+    //   }
+    //   if (password.length < 6) {
+    //     Toast.show({
+    //       type: 'error',
+    //       text1: 'Failed to register',
+    //       text2: 'Password length must be at least 6 characters',
+    //     });
+    //   }
+    //   if (password !== confirmPassword) {
+    //     Toast.show({
+    //       type: 'error',
+    //       text1: 'Failed to register',
+    //       text2: 'Passwords do not match',
+    //     });
+    //   }
+    //   Toast.show({
+    //     type: 'error',
+    //     text1: 'Failed to register',
+    //     text2: 'Please fill all fields',
+    //   });
+    // }
+  };
 
   return (
     <>
@@ -118,6 +151,8 @@ const SignUpScreen = ({navigation}: any) => {
               globalStyles.text,
               {fontFamily: appInfos.fontFamilies.fontMd},
             ]}
+            required
+            helpText="Please fill the username"
             value={username}
             placeholder="Username"
             placeholderColor="#747688"
@@ -210,14 +245,9 @@ const SignUpScreen = ({navigation}: any) => {
 
         <Space height={18} />
 
-        {errorText && (
-          <Section>
-            <Text text={errorText} size={14} color={appColors.danger} />
-          </Section>
-        )}
-
         <Section styles={{alignItems: 'center'}}>
           <Button
+            disable={isDisable}
             title="Sign Up"
             textStyleProps={{
               color: appColors.white,
@@ -229,7 +259,9 @@ const SignUpScreen = ({navigation}: any) => {
               globalStyles.button,
               {
                 width: appInfos.sizes.width * 0.9,
-                backgroundColor: appColors.primary,
+                backgroundColor: isDisable
+                  ? appColors.grey4
+                  : appColors.primary,
                 minHeight: 64,
                 borderRadius: 16,
               },

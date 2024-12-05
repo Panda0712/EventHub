@@ -39,4 +39,13 @@ export const globalStyles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 20,
   },
+
+  iconContainer: {
+    width: 30,
+    height: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#3d56f0',
+    borderRadius: 100,
+  },
 });
